@@ -1,6 +1,6 @@
 # Contributor: Kyle Johnson <kyle@vacantminded.com>
 # Maintainer: Kyle Johnson <kyle@vacantminded.com>
-pkgname=weechat-git
+pkgname=weechat-nightly
 pkgver=`date -u +%Y%m%d`
 pkgrel=0
 pkgdesc="Fast, light, and extensible IRC client (curses UI)"
