@@ -1,0 +1,35 @@
+# Contributor:
+# Maintainer:
+pkgname=cmatrix
+pkgver=1.2
+_pkgver="1.2a"
+pkgrel=0
+pkgdesc="ncurses The Matrix scrolling text simulator"
+url="http://www.asty.org/cmatrix/"
+arch="all"
+license="GPL"
+depends=""
+makedepends="ncurses-dev"
+install=""
+subpackages=""
+source="http://www.asty.org/cmatrix/dist/cmatrix-${_pkgver}.tar.gz"
+
+_builddir="$srcdir/$pkgname-$_pkgver"
+
+build() {
+	cd "$_builddir"
+
+	./configure --prefix=/usr/
+	make || return 1
+}
+
+package() {
+	cd "$_builddir"
+
+	make DESTDIR="$pkgdir/" install
+}
+
+
+md5sums="ebfb5733104a258173a9ccf2669968a1  cmatrix-1.2a.tar.gz"
+sha256sums="1fa6e6caea254b6fe70a492efddc1b40ad7ccb950a5adfd80df75b640577064c  cmatrix-1.2a.tar.gz"
+sha512sums="a653a840378da87877bda1b48fc4087e7789b548e0f943ae15b81b5dc7a847aed28c69d2ad955bd467f38d6a08b0960349490b61c30260767e7d1560bb542d82  cmatrix-1.2a.tar.gz"
