@@ -1,0 +1,50 @@
+# Contributor: Kyle Johnson <kyle@vacantminded.com>
+# Maintainer: Kyle Johnson <kyle@vacantminded.com>
+pkgname=codemarkov-nightly
+pkgver=`date -u +%Y%m%d`
+pkgrel=0
+pkgdesc="Markov chains by character rather than word."
+url="https://github.com/aji/codemarkov"
+arch="all"
+license="MIT"
+depends=""
+depends_dev="gcc"
+makedepends="$depends_dev"
+install=""
+subpackages=""
+source=""
+
+_gitroot="https://github.com/aji/codemarkov.git"
+_gitname="codemarkov"
+_builddir="$srcdir/$_gitname-build"
+
+build() {
+	cd "$srcdir"
+	echo "Connecting to git server..."
+	
+	if [ -d $_gitname ] ; then
+		cd $_gitname && git pull origin
+		echo "Local files updated."
+	else
+		echo "Cloning repo..."
+		git clone $_gitroot $_gitname
+	fi
+	
+	echo "Done"
+	
+	rm -rf "$_builddir"
+
+	git clone "$srcdir/$_gitname" "$_builddir"
+	cd "$_builddir"
+	
+	make
+}
+
+package() {
+	cd "$_builddir"
+
+	install -d "${pkgdir}/usr/bin/"
+
+	install -m 777 codemarkov "${pkgdir}/usr/bin/codemarkov"
+}
+
