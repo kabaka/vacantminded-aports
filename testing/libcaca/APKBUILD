@@ -1,0 +1,39 @@
+# Contributor: Kyle Johnson <kyle@vacantminded.com>
+# Maintainer:
+pkgname=libcaca
+pkgver=0.99.17
+_pkgver=0.99.beta17
+pkgrel=1
+pkgdesc="Color ASCII art library."
+url="http://libcaca.zoy.org/"
+arch="all"
+license="LGPL"
+depends="imlib2 ncurses"
+depends_dev="imlib2-dev ncurses-dev"
+makedepends="$depends_dev"
+install=""
+subpackages="$pkgname-dev"
+source="http://libcaca.zoy.org/files/libcaca/${pkgname}-${_pkgver}.tar.gz"
+options="libtool"
+
+_builddir="$srcdir/$pkgname-$_pkgver"
+
+build() {
+	cd "$_builddir"
+	
+	
+	./configure --prefix=/usr --mandir=/usr/share/man \
+		--enable-shared --disable-doc \
+		--disable-cxx --disable-gl --disable-csharp
+	
+	make || return 1
+}
+
+package() {
+	cd "$_builddir"
+	
+	make DESTDIR="${pkgdir}" install
+	rm -rf "${pkgdir}/usr/local"
+}
+
+md5sums="790d6e26b7950e15909fdbeb23a7ea87  libcaca-0.99.beta17.tar.gz"

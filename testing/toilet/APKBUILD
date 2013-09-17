@@ -1,0 +1,34 @@
+# Contributor: Kyle Johnson <kyle@vacantminded.com>
+# Maintainer:
+pkgname=toilet
+pkgver=0.2
+pkgrel=0
+pkgdesc="Free replacement for the FIGlet utility."
+url="http://libcaca.zoy.org/wiki/toilet"
+arch="all"
+license="WTFPL"
+depends="zlib"
+depends_dev=""
+makedepends="libcaca-dev"
+install=""
+subpackages=""
+source="http://libcaca.zoy.org/files/toilet/$pkgname-$pkgver.tar.gz"
+
+_builddir="$srcdir/$pkgname-$pkgver"
+
+build() {
+	cd "$_builddir"
+	
+	./configure --prefix=/usr LDFLAGS="-Wl,--no-as-needed"
+	make || return 1
+}
+
+package() {
+	cd "$_builddir"
+	
+	make DESTDIR="${pkgdir}" install
+	install -Dm644 COPYING ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
+}
+
+md5sums="4dec7585a2a2d716a765d553cdc1ddaf  toilet-0.2.tar.gz"
+

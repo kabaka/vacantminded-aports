@@ -1,0 +1,33 @@
+# Contributor: Kyle Johnson <kyle@vacantminded.com>
+# Maintainer:
+pkgname=beep
+pkgver=1.3
+pkgrel=0
+pkgdesc="Advanced PC speaker beeping program"
+url="http://www.johnath.com/beep"
+arch="any"
+license="GPL2"
+depends=""
+depends_dev=""
+makedepends="$depends_dev"
+install=""
+subpackages=""
+source="http://www.johnath.com/beep/${pkgname}-${pkgver}.tar.gz"
+
+_builddir="${srcdir}/${pkgname}-${pkgver}"
+
+build() {
+	cd "$_builddir"
+
+  sed -i "s:-Wall:${CFLAGS}:" Makefile
+  make
+}
+
+package() {
+	cd "$_builddir"
+
+  install -D -m755 beep "${pkgdir}/usr/bin/beep"
+  #install -D -m644 beep.1.gz "${pkgdir}/usr/share/man/man1/beep.1.gz"
+}
+
+md5sums="49c340ceb95dbda3f97b2daafac7892a  beep-1.3.tar.gz"
