@@ -1,0 +1,11 @@
+--- ./src/decoder/modplug_decoder_plugin.c.orig
++++ ./src/decoder/modplug_decoder_plugin.c
+@@ -108,7 +108,7 @@ mod_decode(struct decoder *decoder, stru
+
+	ModPlug_GetSettings(&settings);
+	/* alter setting */
+-	settings.mResamplingMode = MODPLUG_RESAMPLE_FIR; /* RESAMP */
++	settings.mResamplingMode = MODPLUG_RESAMPLE_NEAREST; /* RESAMP */
+	settings.mChannels = 2;
+	settings.mBits = 16;
+	settings.mFrequency = 44100;

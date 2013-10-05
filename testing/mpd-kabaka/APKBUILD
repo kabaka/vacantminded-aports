@@ -1,0 +1,86 @@
+# Contributor: Sebastian Wicki <gandro@gmx.net>
+# Maintainer: Kyle Johnson <kyle@vacantminded.com>
+pkgname=mpd-kabaka
+_pkgname=mpd
+pkgver=0.17.5
+pkgrel=4
+pkgdesc="Music daemon that plays MP3, FLAC, and Ogg Vorbis files"
+url="http://musicpd.org"
+pkgusers="mpd"
+pkggroups="mpd audio"
+arch="all"
+license="GPL2"
+depends=
+makedepends="pkgconfig lame-dev glib-dev curl-dev libao-dev libmad-dev flac-dev
+	libogg-dev faad2-dev libid3tag-dev libvorbis-dev alsa-lib-dev
+	libsamplerate-dev libshout-dev libmodplug-dev zziplib-dev"
+install="$pkgname.pre-install"
+subpackages="$pkgname-doc"
+source="http://www.musicpd.org/download/mpd/${pkgver%.*}/mpd-$pkgver.tar.xz
+	mpd.initd
+	mpd.confd
+	mpd-chiptunes.patch
+	"
+
+prepare() {                                                    
+	cd "$srcdir"/${_pkgname}-$pkgver
+	for i in $source; do                                   
+		case $i in                                     
+			*.patch)                                       
+				msg "Applying $i"                      
+				patch -p1 -i "$srcdir"/$i || return 1  
+				;;                                     
+		esac                                           
+	done                                                   
+}                                                              
+
+
+
+build() {
+	cd "$srcdir"/$_pkgname-$pkgver
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/info \
+		--enable-shout \
+		--enable-modplug \
+		--enable-zzip \
+		--enable-pipe-output \
+		|| return 1
+	make || return 1
+}
+
+package() {
+	cd "$srcdir"/$_pkgname-$pkgver
+	make DESTDIR="$pkgdir" install
+
+	#provide a config that works by default
+	install -d "$pkgdir"/etc
+	sed -e 's:\#pid_file.*:pid_file\t\t"/var/run/mpd/mpd.pid":' \
+		-e 's:\#user.*:user\t\t"mpd":' \
+		-e 's:\#log_file.*:log_file\t\t"syslog":' \
+		doc/mpdconf.example > "$pkgdir"/etc/mpd.conf
+
+	install -m755 -D "$srcdir"/$_pkgname.initd "$pkgdir"/etc/init.d/$_pkgname
+	install -m644 -D "$srcdir"/$_pkgname.confd "$pkgdir"/etc/conf.d/$_pkgname
+	install -d -g audio -o mpd -m775 \
+		"$pkgdir"/var/run/mpd \
+		"$pkgdir"/var/log/mpd \
+		"$pkgdir"/var/lib/mpd/playlists \
+		"$pkgdir"/var/lib/mpd/music
+}
+md5sums="b68be330deeb23989c08a9fefd9fcdeb  mpd-0.17.5.tar.xz
+2ccbb38edc6dff5b5740760837f3005a  mpd.initd
+dbd301041953a5cf9c2b9de8f23eb6bb  mpd.confd
+cecac164576c3ca5ed9d170b9bca92b8  mpd-chiptunes.patch"
+sha256sums="8f43562cf0d98f84c13745dfb7cfd08e66f2dbae9aa35268b130ab053b030200  mpd-0.17.5.tar.xz
+5f9d066a044d6cb1a9990a59f63dd4a07e78e5179ad90b22374db09b7c62cafd  mpd.initd
+32c072f77c23c2cc2dd7c93b65b73015e0587caaf2740856132af32cee623206  mpd.confd
+600d41fe01b21a2a0512822f287b20aab1608f8bb1b67b135e3a7c0705cc9169  mpd-chiptunes.patch"
+sha512sums="b707ae8098f9b970be1b954c9a2e3bb1ae25d155a2b85331c2196c23bd9cb7c8512715748b765018445adff97bab511cab5c8e6f9cb3f51c7e8aedbcd20cc302  mpd-0.17.5.tar.xz
+80ad8c2fa59c1bd52d3db50e46208f64d027fbecd753b6d688a1095627c8a8b84bd337a682a192bde0b2155edc0eafbe59ed47bae3b3c26c4b1c0a8090d77f6d  mpd.initd
+41b2467f5b03f5c4dd7003cd5f56f6cfc1f67af7a9aa2538d70360f839625222bdd0c4b04c33e8cd52eeecfc354da3ca22f5aaab8aee357a5774aaf3503594e7  mpd.confd
+24e4f3024789212ab863356dcf090d8048ac5a7c1b67c0edef9e327f7800ccdfacc885c68b85512160b337ebd58aa2bb40b62de2caadf89e76b80754d7f2deef  mpd-chiptunes.patch"
