@@ -1,0 +1,70 @@
+# Contributor: Sam Dodrill <shadow.h511@gmail.com>
+# Maintainer: Sam Dodrill <shadow.h511@gmail.com>
+pkgname=ponychat-ircd
+pkgver=6.5.1
+pkgrel=1
+pkgdesc="Scalable IRC daemon with many useful features"
+url="http://www.github.com/ponychat/ponychat-ircd"
+arch="all"
+license="GPL2"
+pkgusers="ircd"
+depends=""
+depends_dev="bison flex openssl-dev zlib-dev libtool"
+makedepends="$depends_dev"
+install="$pkgname.pre-install"
+subpackages="$pkgname-dev $pkgname-doc"
+source="https://github.com/PonyChat/ponychat-ircd/archive/$pkgname-6.5.1.tar.gz
+	$pkgname.initd
+	$pkgname.confd"
+_builddir="$srcdir"/$pkgname-$pkgname-$pkgver
+prepare() {
+	local i
+	cd "$_builddir"
+	for i in $source; do
+		case $i in
+			*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
+		esac
+	done
+}
+build() {
+	cd "$_builddir"
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc/ponychat-ircd \
+		--localstatedir=/var \
+		--libexecdir=/usr/lib \
+		--disable-assert \
+		--enable-ssl \
+		--enable-ipv6 \
+		--with-rundir=/var/run \
+		|| return 1
+	 make
+}
+
+package() {
+	cd "$_builddir"
+	make DESTDIR="$pkgdir" install
+        rm -f "$pkgdir"/usr/lib/*.la
+        install -m755 -D "$srcdir"/$pkgname.initd \
+              "$pkgdir"/etc/init.d/ponychat-ircd || return 1
+        install -m644 -D "$srcdir"/$pkgname.confd \
+              "$pkgdir"/etc/conf.d/ponychat-ircd || return 1
+        chown ircd "$pkgdir"/var/run/ponychat-ircd
+        chown ircd "$pkgdir"/var/log/ponychat-ircd
+        chown ircd "$pkgdir"/var/ponychat-ircd
+	sed -i -e "s/\"modules\"/\"\/usr\/lib\/ponychat-ircd\/modules\"/g" $pkgdir/etc/$pkgname/example.conf
+	sed -i -e "s/\"modules\/autoload\"/\"\/usr\/lib\/ponychat-ircd\/modules\/autoload\"/g" "$pkgdir"/etc/$pkgname/example.conf
+	sed -i -e "s/usr\/local\/ircd\/modules/usr\/lib\/ponychat-ircd\/modules/g" "$pkgdir"/etc/$pkgname/reference.conf
+}
+
+md5sums="38b740339080d03bfa1d6212c9a36297  ponychat-ircd-6.5.1.tar.gz
+91d6a83663332707d4ba3c45c75f842c  ponychat-ircd.initd
+6994e3d2220b59862e5a24978a26bfbd  ponychat-ircd.confd"
+sha256sums="a698b5a4b82d4be41e5c2df4b104250b999038f161a2165d1fd467756ebdb9f3  ponychat-ircd-6.5.1.tar.gz
+a3d5c3ea4cc7c417980be04284a2b225d7e4a82e9aeb385fc386ace6ed214a02  ponychat-ircd.initd
+fc50f2870a155723817e50b156c8823ab949d187e333bc7838b3f91509bec7cc  ponychat-ircd.confd"
+sha512sums="8ff674d35874d124a0199354fb6ee9e1152f5d2ba2aeb020b62a4baa1f7fa85b6eebcd5ce12847588adbd1469d1ea272c1e7d286a554d5fe89fe6e658aa77959  ponychat-ircd-6.5.1.tar.gz
+3a7de2e2dc99d05e5ef2d974d682457e2104e12d426bfbbd219c09c4f40a81a12e44ab21d0636335dbc495dcc41e80c1e1e517e043b02bcff859a89f24881fbd  ponychat-ircd.initd
+757237be7b42336dded2c557b80eec4aafe67821b2aec99db867b22203896d6751a813bc56c140300de04e39460cd3a94c40a30beecaee9107600e4dcdbb9def  ponychat-ircd.confd"
