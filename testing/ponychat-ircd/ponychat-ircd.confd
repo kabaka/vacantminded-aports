@@ -1,0 +1,3 @@
+PONYCHAT-IRCD_USER="ircd"
+PONYCHAT-IRCD_PID="/var/run/ponychat-ircd/ircd.pid"
+PONYCHAT-IRCD_CONF="/etc/ponychat-ircd/ircd.conf"
