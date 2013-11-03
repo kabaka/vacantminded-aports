@@ -1,0 +1,38 @@
+# Contributor: Kyle Johnson <kyle@vacantminded.com>
+# Maintainer:
+pkgname=grits
+pkgver=0.8
+pkgrel=0
+pkgdesc="Virtual Globe library using GTK+ and OpenGL"
+url="http://lug.rose-hulman.edu/proj/aweather/grits"
+arch="all"
+license="GPL"
+depends=""
+depends_dev="gtk+2.0-dev libsoup-dev mesa-dev glib-dev libtool glu-dev"
+makedepends="$depends_dev"
+install=""
+subpackages="$pkgname-dev $pkgname-doc"
+source="http://pileus.org/$pkgname/files/$pkgname-$pkgver.tar.gz"
+
+_builddir="$srcdir/$pkgname-$pkgver"
+
+
+build() {
+	cd "$_builddir"
+
+
+	./configure --prefix=/usr
+	make GLIB_LIBS="$GLIB_LIBS -lgmodule-2.0 -lgthread-2.0"
+	#make
+}
+
+package() {
+	cd "$_builddir"
+
+	make DESTDIR=$pkgdir install
+	find "$pkgdir" -name '*.la' -delete
+}
+
+md5sums="b723bc34b4657c70d177e3f2a9f51605  grits-0.8.tar.gz"
+sha256sums="9191a1617fa6b96615f1436054a39ddb681f205ab062f5a6b79079244e9853ea  grits-0.8.tar.gz"
+sha512sums="713df5c4c9aa5edc9a00485b30b2bcd86470752d4041235fb10760cd869c9ef5edbe4f11d98a1f598331542f0e097e6e87c689c15e7d10863fc9d0534e3743ae  grits-0.8.tar.gz"
