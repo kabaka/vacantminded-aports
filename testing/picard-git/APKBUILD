@@ -1,0 +1,48 @@
+# Contributor: Kyle Johnson <kyle@vacantminded.com>
+# Maintainer:
+pkgname=picard-git
+pkgver=`date -u +%Y%m%d`
+pkgrel=0
+pkgdesc="MusicBrainz tagging application"
+url="http://musicbrainz.org/doc/MusicBrainz_Picard"
+arch="all"
+license="GPL"
+depends="py-qt mutagen ffmpeg"
+depends_dev=""
+makedepends="$depends_dev git"
+install=""
+subpackages=""
+source=""
+
+_gitroot="https://github.com/musicbrainz/picard.git"
+_gitname="picard"
+_builddir="$srcdir/$_gitname-build"
+
+build() {
+	cd "$srcdir"
+
+  msg "Connecting to GIT server...."
+  if [[ -d "$_gitname" ]]; then
+    cd "$_gitname" && git pull origin
+    msg "The local files are updated."
+  else
+    git clone "$_gitroot" "$_gitname"
+  fi
+  
+  msg "GIT checkout done or server timeout"
+  msg "Starting build..."
+
+  rm -rf "$srcdir/$_gitname-build"
+  git clone "$srcdir/$_gitname" "$srcdir/$_gitname-build"
+  
+  cd "$srcdir/$_gitname-build"
+
+  python setup.py config
+  python setup.py build
+}
+
+package() {
+	cd "$_builddir"
+
+  python setup.py install --root=$pkgdir
+}
