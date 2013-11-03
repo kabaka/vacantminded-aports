@@ -1,0 +1,51 @@
+# Contributor: Kyle Johnson <kyle@vacantminded.com>
+# Maintainer:
+pkgname=hdf5
+pkgver=1.8.11
+pkgrel=0
+pkgdesc="General purpose library and file format for storing scientific data"
+url="http://www.hdfgroup.org/HDF5/"
+arch="all"
+license="custom"
+depends=""
+depends_dev="zlib-dev bash"
+makedepends="$depends_dev"
+install=""
+subpackages="$pkgname-dev $pkgname-doc"
+source="http://www.hdfgroup.org/ftp/HDF5/current/src/${pkgname}-${pkgver}.tar.bz2"
+
+_builddir="$srcdir/${pkgname}-${pkgver}"
+
+build() {
+	cd "$_builddir"
+
+	export CFLAGS="${CFLAGS/O2/O0}"
+	export CXXFLAGS="${CFLAGS}"
+	./configure --prefix=/usr \
+		--disable-static \
+		--enable-hl \
+		--enable-threadsafe \
+		--enable-linux-lfs \
+		--enable-production \
+		--with-pic \
+		--docdir=/usr/share/doc/hdf5/ \
+		--with-pthread=/usr/lib/ \
+		--disable-sharedlib-rpath
+	make
+}
+
+package() {
+	cd "$_builddir"
+
+	make DESTDIR=$pkgdir install
+
+	install -d -m755 $pkgdir/usr/share/licenses/${pkgname}
+	install -m644 $srcdir/${pkgname}-${pkgver}/COPYING \
+		$pkgdir/usr/share/licenses/${pkgname}/LICENSE 
+
+	find "$pkgdir" -name '*.la' -delete
+}
+
+md5sums="3433c1be767d2b8e5b0771a3209b4fcc  hdf5-1.8.11.tar.bz2"
+sha256sums="5ea1ba82fc77350ee628b795ae6ede05feeaf1c6b437911a9478de456600cafb  hdf5-1.8.11.tar.bz2"
+sha512sums="a29484d1b046be7cb6f050417f097859aba605c0ebab09ea568458a316d36c294576f2b115a098a330c544ff3e08e31d36cd9ca7d048892b234d61ba36240747  hdf5-1.8.11.tar.bz2"
