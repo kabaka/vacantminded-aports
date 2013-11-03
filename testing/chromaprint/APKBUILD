@@ -1,0 +1,48 @@
+# Contributor: Kyle Johnson <kyle@vacantminded.com>
+# Maintainer:
+pkgname=chromaprint-git
+pkgver=`date -u +%Y%m%d`
+pkgrel=2
+pkgdesc="AcoustID audio fingerprinting library."
+url="http://acoustid.org/chromaprint"
+arch="all"
+license="GPL"
+depends=""
+depends_dev=""
+makedepends="git ffmpeg-dev boost-filesystem taglib-dev"
+install=""
+subpackages=""
+source=""
+
+_gitroot="https://bitbucket.org/acoustid/chromaprint.git"
+_gitname="chromaprint"
+_builddir="$srcdir/$_gitname-build"
+
+build() {
+	cd "$srcdir"
+
+	msg "Connecting to GIT server...."
+	if [[ -d "$_gitname" ]]; then
+		cd "$_gitname" && git pull origin
+		msg "The local files are updated."
+	else
+		git clone "$_gitroot" "$_gitname"
+	fi
+
+	msg "GIT checkout done or server timeout"
+	msg "Starting build..."
+
+	rm -rf "$srcdir/$_gitname-build"
+	git clone "$srcdir/$_gitname" "$srcdir/$_gitname-build"
+
+	cd "$srcdir/$_gitname-build"
+
+	cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=ON .
+	make
+}
+
+package() {
+	cd "$_builddir"
+
+	make DESTDIR="${pkgdir}" install
+}
