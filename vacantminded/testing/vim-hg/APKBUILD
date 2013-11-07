@@ -1,0 +1,65 @@
+# Contributor: Kyle Johnson <kyle@vacantminded.com>
+# Maintainer:
+pkgname=vim-hg
+pkgver=`date -u +%Y%m%d`
+pkgrel=0
+pkgdesc="advanced text editor"
+url="http://www.vim.org"
+arch="all"
+license="GPL"
+depends=""
+depends_dev=""
+makedepends="ncurses-dev lua5.2-dev mercurial"
+install=""
+subpackages=""
+source="vim-gcc47.patch vimrc"
+
+_hgroot="https://code.google.com/p/vim/"
+_hgname="vim"
+_builddir="$srcdir/$_hgname"
+
+build() {
+	cd "$srcdir"
+
+	msg "Connecting to Mercurial server...."
+	hg clone "$_hgroot" "$_hgname"
+
+	msg "Mercurial checkout done or server timeout"
+	msg "Starting build..."
+
+	cd "$_builddir"
+
+	pwd
+
+	patch -p0 -i "$srcdir"/vim-gcc47.patch || return 1
+
+	# Read vimrc from /etc/vim
+	echo '#define SYS_VIMRC_FILE "/etc/vim/vimrc"' >> src/feature.h
+
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--enable-luainterp \
+		--without-x \
+		--disable-nls \
+		--enable-multibyte \
+		--enable-gui=no \
+		--with-lua-prefix=/usr/lua5.2 \
+		|| return 1
+	make || return 1
+
+}
+
+package() {
+	cd "$_builddir"
+	make DESTDIR="$pkgdir/" install
+	install -D "$srcdir"/vimrc "$pkgdir"/etc/vim/vimrc
+
+}
+md5sums="a2e71b09d38921d43d2a552d4f0bd1aa  vim-gcc47.patch
+97aecde2ab504e543a96bec84b3b5638  vimrc"
+sha256sums="9997f5a3c36e5b41008ac2d84165dda4d20124043cbc033d1d69e5d884fb4334  vim-gcc47.patch
+7ac7e5fd75fe315fd8b3ca4172056ebb9f06df0b5985d3ff88133dfcdd87076b  vimrc"
+sha512sums="a212404de5e4bf70bd584e3f46a22c3e246f206cf995c5771a020be9eb7b6bc71d422788b309eb677b2822df94266854704c29802f2f8e47cea6905d68833460  vim-gcc47.patch
+d9586b777881973cb5e48e18750336a522ed72c3127b2d6b6991e2b943468ca5b694476e7fa39ab469178c1375fc8f52627484e0fe377aea5811a513e35a7b02  vimrc"
