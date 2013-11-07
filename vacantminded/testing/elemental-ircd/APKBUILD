@@ -1,0 +1,73 @@
+# Contributor: Sam Dodrill <shadow.h511@gmail.com>
+# Maintainer: Sam Dodrill <shadow.h511@gmail.com>
+pkgname=elemental-ircd
+pkgver=6.5.1.1
+pkgrel=0
+pkgdesc="Scalable IRC daemon with many useful features"
+url="https://www.github.com/PonyChat/elemental-ircd"
+arch="all"
+license="GPL2"
+pkgusers="ircd"
+depends=""
+depends_dev=""
+makedepends="bison flex openssl-dev zlib-dev libtool"
+install="$pkgname.pre-install"
+subpackages="$pkgname-doc"
+source="https://github.com/PonyChat/${pkgname}/archive/${pkgname}-${pkgver}.tar.gz
+	${pkgname}.initd
+	${pkgname}.confd"
+replaces="ponychat-ircd"
+_builddir="$srcdir"/$pkgname-$pkgname-$pkgver
+
+prepare() {
+	local i
+	cd "$_builddir"
+	for i in $source; do
+		case $i in
+			*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
+		esac
+	done
+}
+
+build() {
+	cd "$_builddir"
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc/$pkgname \
+		--localstatedir=/var \
+		--libexecdir=/usr/lib \
+		--disable-assert \
+		--enable-ssl \
+		--enable-ipv6 \
+		--with-rundir=/var/run \
+		|| return 1
+	 make
+}
+
+package() {
+	cd "$_builddir"
+	make DESTDIR="$pkgdir" install
+        rm -f "$pkgdir"/usr/lib/*.la
+        install -m755 -D "$srcdir"/$pkgname.initd \
+              "$pkgdir"/etc/init.d/elemental-ircd || return 1
+        install -m644 -D "$srcdir"/$pkgname.confd \
+              "$pkgdir"/etc/conf.d/elemental-ircd || return 1
+        chown ircd "$pkgdir"/var/run/$pkgname
+        chown ircd "$pkgdir"/var/log/$pkgname
+        chown ircd "$pkgdir"/var/elemental-ircd
+	sed -i -e "s/\"modules\"/\"\/usr\/lib\/elemental-ircd\/modules\"/g" $pkgdir/etc/$pkgname/example.conf
+	sed -i -e "s/\"modules\/autoload\"/\"\/usr\/lib\/elemental-ircd\/modules\/autoload\"/g" "$pkgdir"/etc/$pkgname/example.conf
+	sed -i -e "s/usr\/local\/ircd\/modules/usr\/lib\/elemental-ircd\/modules/g" "$pkgdir"/etc/$pkgname/reference.conf
+}
+
+md5sums="568349239149e4a2e0c8c70296884c3b  elemental-ircd-6.5.1.1.tar.gz
+91d6a83663332707d4ba3c45c75f842c  elemental-ircd.initd
+6994e3d2220b59862e5a24978a26bfbd  elemental-ircd.confd"
+sha256sums="ce6a80b3643980d68d3aa07256b2439918226eeaa083e236900bdcc573f6a592  elemental-ircd-6.5.1.1.tar.gz
+a3d5c3ea4cc7c417980be04284a2b225d7e4a82e9aeb385fc386ace6ed214a02  elemental-ircd.initd
+fc50f2870a155723817e50b156c8823ab949d187e333bc7838b3f91509bec7cc  elemental-ircd.confd"
+sha512sums="31ebb09ec875147e176482380c55e04e81b24d3c3a759a7e3d1396fab96b38ff572703566472e98b7736976609946cf04e318b12673be97f10abff39726399a0  elemental-ircd-6.5.1.1.tar.gz
+3a7de2e2dc99d05e5ef2d974d682457e2104e12d426bfbbd219c09c4f40a81a12e44ab21d0636335dbc495dcc41e80c1e1e517e043b02bcff859a89f24881fbd  elemental-ircd.initd
+757237be7b42336dded2c557b80eec4aafe67821b2aec99db867b22203896d6751a813bc56c140300de04e39460cd3a94c40a30beecaee9107600e4dcdbb9def  elemental-ircd.confd"
