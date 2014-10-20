@@ -3,7 +3,7 @@
 pkgname=cmatrix
 pkgver=1.2
 _pkgver="1.2a"
-pkgrel=0
+pkgrel=1
 pkgdesc="ncurses The Matrix scrolling text simulator"
 url="http://www.asty.org/cmatrix/"
 arch="all"
