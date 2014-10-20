@@ -2,8 +2,13 @@
 # Maintainer: Kyle Johnson <kyle@vacantminded.com>
 pkgname=mpd-kabaka
 _pkgname=mpd
-pkgver=0.17.5
-pkgrel=4
+pkgver=0.19
+case $pkgver in
+*.*.*) _branch=${pkgver%.*};;
+*.*) _branch=$pkgver;;
+esac
+
+pkgrel=1
 pkgdesc="Music daemon that plays MP3, FLAC, and Ogg Vorbis files"
 url="http://musicpd.org"
 pkgusers="mpd"
@@ -11,33 +16,36 @@ pkggroups="mpd audio"
 arch="all"
 license="GPL2"
 depends=
-makedepends="pkgconfig lame-dev glib-dev curl-dev libao-dev libmad-dev flac-dev
+replaces="mpd"
+makedepends="lame-dev glib-dev curl-dev libao-dev libmad-dev flac-dev
 	libogg-dev faad2-dev libid3tag-dev libvorbis-dev alsa-lib-dev
-	libsamplerate-dev libshout-dev libmodplug-dev zziplib-dev"
-install="$pkgname.pre-install"
-subpackages="$pkgname-doc"
-source="http://www.musicpd.org/download/mpd/${pkgver%.*}/mpd-$pkgver.tar.xz
+	libsamplerate-dev libshout-dev libmodplug-dev boost-dev icu-dev
+	autoconf automake libtool libintl zlib-dev bzip2-dev libshout-dev
+	libsndfile-dev"
+install="${pkgname}.pre-install"
+subpackages="${_pkgname}-doc"
+source="http://www.musicpd.org/download/mpd/$_branch/mpd-$pkgver.tar.xz
+	fix-musl.patch
+	underlinking.patch
 	mpd.initd
 	mpd.confd
-	mpd-chiptunes.patch
 	"
 
-prepare() {                                                    
-	cd "$srcdir"/${_pkgname}-$pkgver
-	for i in $source; do                                   
-		case $i in                                     
-			*.patch)                                       
-				msg "Applying $i"                      
-				patch -p1 -i "$srcdir"/$i || return 1  
-				;;                                     
-		esac                                           
-	done                                                   
-}                                                              
+_builddir="$srcdir/${_pkgname}-$pkgver"
 
-
+prepare() {
+	cd "$_builddir"
+	for i in $source; do
+		case $i in
+		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
+		esac
+	done
+	libtoolize --force && aclocal && autoconf && automake --add-missing \
+		|| return 1
+}
 
 build() {
-	cd "$srcdir"/$_pkgname-$pkgver
+	cd "$_builddir"
 	./configure \
 		--build=$CBUILD \
 		--host=$CHOST \
@@ -47,14 +55,18 @@ build() {
 		--infodir=/usr/share/info \
 		--enable-shout \
 		--enable-modplug \
-		--enable-zzip \
+		--enable-zlib \
+		--enable-bzip2 \
+		--enable-flac \
 		--enable-pipe-output \
+		--enable-shout \
+		--enable-sndfile \
 		|| return 1
 	make || return 1
 }
 
 package() {
-	cd "$srcdir"/$_pkgname-$pkgver
+	cd "$_builddir"
 	make DESTDIR="$pkgdir" install
 
 	#provide a config that works by default
@@ -64,23 +76,26 @@ package() {
 		-e 's:\#log_file.*:log_file\t\t"syslog":' \
 		doc/mpdconf.example > "$pkgdir"/etc/mpd.conf
 
-	install -m755 -D "$srcdir"/$_pkgname.initd "$pkgdir"/etc/init.d/$_pkgname
-	install -m644 -D "$srcdir"/$_pkgname.confd "$pkgdir"/etc/conf.d/$_pkgname
+	install -m755 -D "$srcdir"/${_pkgname}.initd "$pkgdir"/etc/init.d/${_pkgname}
+	install -m644 -D "$srcdir"/${_pkgname}.confd "$pkgdir"/etc/conf.d/${_pkgname}
 	install -d -g audio -o mpd -m775 \
 		"$pkgdir"/var/run/mpd \
 		"$pkgdir"/var/log/mpd \
 		"$pkgdir"/var/lib/mpd/playlists \
 		"$pkgdir"/var/lib/mpd/music
 }
-md5sums="b68be330deeb23989c08a9fefd9fcdeb  mpd-0.17.5.tar.xz
+md5sums="770261630e6f086bd7d5b374abf521c0  mpd-0.19.tar.xz
+efa521234a16b5f4ffbde40ef645eab2  fix-musl.patch
+a84cce5fdb848c7d282e38698432df51  underlinking.patch
 2ccbb38edc6dff5b5740760837f3005a  mpd.initd
-dbd301041953a5cf9c2b9de8f23eb6bb  mpd.confd
-cecac164576c3ca5ed9d170b9bca92b8  mpd-chiptunes.patch"
-sha256sums="8f43562cf0d98f84c13745dfb7cfd08e66f2dbae9aa35268b130ab053b030200  mpd-0.17.5.tar.xz
+dbd301041953a5cf9c2b9de8f23eb6bb  mpd.confd"
+sha256sums="613239979330d30f08e793ec202c7d6d45c5e78bc744e0216d30316e758d771c  mpd-0.19.tar.xz
+cf3cb6c2e1b93baabbe0375e75b8909f80589c568c28c1e301c9ad960550d5d8  fix-musl.patch
+b3a0499cbd3f759612ad94fce00588d97e5e82af0b2bcc560869eb977067a426  underlinking.patch
 5f9d066a044d6cb1a9990a59f63dd4a07e78e5179ad90b22374db09b7c62cafd  mpd.initd
-32c072f77c23c2cc2dd7c93b65b73015e0587caaf2740856132af32cee623206  mpd.confd
-600d41fe01b21a2a0512822f287b20aab1608f8bb1b67b135e3a7c0705cc9169  mpd-chiptunes.patch"
-sha512sums="b707ae8098f9b970be1b954c9a2e3bb1ae25d155a2b85331c2196c23bd9cb7c8512715748b765018445adff97bab511cab5c8e6f9cb3f51c7e8aedbcd20cc302  mpd-0.17.5.tar.xz
+32c072f77c23c2cc2dd7c93b65b73015e0587caaf2740856132af32cee623206  mpd.confd"
+sha512sums="55ebf1d4ad89ad9ce63eefb62094b844173313180b927d8d6fa00f9e6ae5dc8c0d1479456058230b6f8e4dfb934079305399172ef2b27eb9a8313a0a8033039d  mpd-0.19.tar.xz
+ea3efdf7baaaabdfbbc8c4571b30c666e0a96465fc05e4c84629304af21d8f26d339c49e9f8de458e6320b1a6334457cd2b8fb633f318e525a261ca8016d2974  fix-musl.patch
+d6a98c5f60a60ddd5fa94b25864f800a6a6fb6ffe114793293d0ccc71bb5d1cdb847ca39fde4128446b55a38be85634106d5d6f2c77ee450f33631b30140781a  underlinking.patch
 80ad8c2fa59c1bd52d3db50e46208f64d027fbecd753b6d688a1095627c8a8b84bd337a682a192bde0b2155edc0eafbe59ed47bae3b3c26c4b1c0a8090d77f6d  mpd.initd
-41b2467f5b03f5c4dd7003cd5f56f6cfc1f67af7a9aa2538d70360f839625222bdd0c4b04c33e8cd52eeecfc354da3ca22f5aaab8aee357a5774aaf3503594e7  mpd.confd
-24e4f3024789212ab863356dcf090d8048ac5a7c1b67c0edef9e327f7800ccdfacc885c68b85512160b337ebd58aa2bb40b62de2caadf89e76b80754d7f2deef  mpd-chiptunes.patch"
+41b2467f5b03f5c4dd7003cd5f56f6cfc1f67af7a9aa2538d70360f839625222bdd0c4b04c33e8cd52eeecfc354da3ca22f5aaab8aee357a5774aaf3503594e7  mpd.confd"
