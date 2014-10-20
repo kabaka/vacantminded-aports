@@ -2,14 +2,14 @@
 # Maintainer:
 pkgname=picard-git
 pkgver=`date -u +%Y%m%d`
-pkgrel=5
+pkgrel=6
 pkgdesc="MusicBrainz tagging application"
 url="http://musicbrainz.org/doc/MusicBrainz_Picard"
 arch="all"
 license="GPL"
 depends="py-qt mutagen python-libdiscid"
 depends_dev=""
-makedepends="ffmpeg python-libdiscid git"
+makedepends="ffmpeg python-libdiscid git python-dev gettext"
 install=""
 subpackages=""
 source=""
