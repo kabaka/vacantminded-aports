@@ -2,14 +2,14 @@
 # Maintainer:
 pkgname=toilet
 pkgver=0.2
-pkgrel=0
+pkgrel=3
 pkgdesc="Free replacement for the FIGlet utility."
 url="http://libcaca.zoy.org/wiki/toilet"
 arch="all"
 license="WTFPL"
 depends="zlib"
 depends_dev=""
-makedepends="libcaca-dev"
+makedepends="libcaca-dev libx11-dev"
 install=""
 subpackages=""
 source="http://libcaca.zoy.org/files/toilet/$pkgname-$pkgver.tar.gz"
