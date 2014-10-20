@@ -2,12 +2,13 @@
 # Maintainer:
 pkgname=vim-hg
 pkgver=`date -u +%Y%m%d`
-pkgrel=0
+pkgrel=2
 pkgdesc="advanced text editor"
 url="http://www.vim.org"
 arch="all"
 license="GPL"
 depends=""
+replaces="vim"
 depends_dev=""
 makedepends="ncurses-dev lua5.2-dev mercurial"
 install=""
