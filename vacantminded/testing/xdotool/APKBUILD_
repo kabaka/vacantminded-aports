@@ -2,7 +2,7 @@
 # Maintainer:
 pkgname=xdotool
 pkgver=2.20110530.1
-pkgrel=0
+pkgrel=1
 pkgdesc="Command-line X11 automation tool"
 url="http://www.semicomplete.com/projects/xdotool/"
 arch="x86_64"

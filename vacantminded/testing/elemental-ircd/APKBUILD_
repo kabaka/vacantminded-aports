@@ -2,7 +2,7 @@
 # Maintainer: Sam Dodrill <shadow.h511@gmail.com>
 pkgname=elemental-ircd
 pkgver=6.5.1.1
-pkgrel=0
+pkgrel=1
 pkgdesc="Scalable IRC daemon with many useful features"
 url="https://www.github.com/PonyChat/elemental-ircd"
 arch="all"

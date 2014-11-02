@@ -3,7 +3,7 @@
 pkgname=libcaca
 pkgver=0.99.17
 _pkgver=0.99.beta17
-pkgrel=1
+pkgrel=2
 pkgdesc="Color ASCII art library."
 url="http://libcaca.zoy.org/"
 arch="all"

@@ -1,8 +1,8 @@
 # Contributor: Kyle Johnson <kyle@vacantminded.com>
 # Maintainer:
 pkgname=hdf5
-pkgver=1.8.11
-pkgrel=0
+pkgver=1.8.12
+pkgrel=1
 pkgdesc="General purpose library and file format for storing scientific data"
 url="http://www.hdfgroup.org/HDF5/"
 arch="all"
@@ -46,6 +46,6 @@ package() {
 	find "$pkgdir" -name '*.la' -delete
 }
 
-md5sums="3433c1be767d2b8e5b0771a3209b4fcc  hdf5-1.8.11.tar.bz2"
-sha256sums="5ea1ba82fc77350ee628b795ae6ede05feeaf1c6b437911a9478de456600cafb  hdf5-1.8.11.tar.bz2"
-sha512sums="a29484d1b046be7cb6f050417f097859aba605c0ebab09ea568458a316d36c294576f2b115a098a330c544ff3e08e31d36cd9ca7d048892b234d61ba36240747  hdf5-1.8.11.tar.bz2"
+md5sums="03ad766d225f5e872eb3e5ce95524a08  hdf5-1.8.12.tar.bz2"
+sha256sums="6d080f913a226a3ce390a11d9b571b2d5866581a2aa4434c398cd371c7063639  hdf5-1.8.12.tar.bz2"
+sha512sums="c678cf506914f3649389e50e3123131e467108d85e4e91e19c11a9643fc0c625588e3ab9bd94a25e0d5ac2568d56c2f3391b2b84e0a582bdaa948fa7d517f899  hdf5-1.8.12.tar.bz2"

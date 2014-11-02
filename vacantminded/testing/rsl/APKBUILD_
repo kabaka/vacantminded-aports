@@ -2,13 +2,13 @@
 # Maintainer:
 pkgname=rsl
 pkgver=1.40
-pkgrel=0
+pkgrel=1
 pkgdesc="Radar Software Library"
 url="http://lug.rose-hulman.edu/proj/aweather/rsl"
 arch="all"
 license="GPL"
 depends=""
-depends_dev="libjpeg"
+depends_dev="libjpeg bash zlib-dev flex"
 makedepends="$depends_dev"
 install=""
 subpackages="$pkgname-dev $pkgname-doc"

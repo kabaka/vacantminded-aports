@@ -2,7 +2,7 @@
 # Maintainer:
 pkgname=grits
 pkgver=0.8
-pkgrel=0
+pkgrel=2
 pkgdesc="Virtual Globe library using GTK+ and OpenGL"
 url="http://lug.rose-hulman.edu/proj/aweather/grits"
 arch="all"

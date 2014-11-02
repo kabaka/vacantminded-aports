@@ -2,7 +2,7 @@
 # Maintainer: Sam Dodrill <shadow.h511@gmail.com>
 pkgname=cheat
 pkgver=`date -u +%Y%m%d)`
-pkgrel=1
+pkgrel=2
 pkgdesc="Cheatsheets for common Linux tools"
 url="https://github.com/chrisallenlane/cheat"
 arch="noarch"
