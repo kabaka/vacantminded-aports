@@ -1,0 +1,47 @@
+# Contributor: Kyle Johnson <kyle@vacantminded.com>
+# Maintainer: Kyle Johnson <kyle@vacantminded.com>
+pkgname=lastpass-cli-nightly
+pkgver=`date -u +%Y%m%d`
+pkgrel=0
+pkgdesc="LastPass command line interface tool."
+url="https://www.lastpass.com/"
+arch="all"
+license="GPL2"
+depends=""
+depends_dev="git openssl-dev curl-dev libxml2-dev pinentry"
+makedepends="$depends_dev"
+install=""
+subpackages=""
+source=""
+
+_gitroot="https://github.com/LastPass/lastpass-cli"
+_gitname="lastpass-cli"
+_builddir="$srcdir/$_gitname-build"
+
+build() {
+	cd "$srcdir"
+	echo "Connecting to git server..."
+	
+	if [ -d $_gitname ] ; then
+		cd $_gitname && git pull origin
+		echo "Local files updated."
+	else
+		echo "Cloning repo..."
+		git clone $_gitroot $_gitname
+	fi
+	
+	echo "Done"
+	
+	rm -rf "$_builddir"
+
+	git clone "$srcdir/$_gitname" "$_builddir"
+	cd "$_builddir"
+	
+	make
+}
+
+package() {
+	cd "$_builddir"
+	make DESTDIR="$pkgdir/" install
+}
+
