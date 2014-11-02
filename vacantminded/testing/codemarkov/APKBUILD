@@ -2,7 +2,7 @@
 # Maintainer: Kyle Johnson <kyle@vacantminded.com>
 pkgname=codemarkov-nightly
 pkgver=`date -u +%Y%m%d`
-pkgrel=1
+pkgrel=2
 pkgdesc="Markov chains by character rather than word."
 url="https://github.com/aji/codemarkov"
 arch="all"
